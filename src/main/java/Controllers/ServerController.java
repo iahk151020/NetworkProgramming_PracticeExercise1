@@ -49,7 +49,7 @@ public class ServerController {
         if (data instanceof String){
             String filter = (String)data;
             //System.out.println("filter: " + filter);
-            String query = "SELECT * FROM dangki WHERE username LIKE '%" + filter + "%'";
+            String query = "SELECT * FROM tbl_user WHERE username LIKE '%" + filter + "%'";
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next() == false){
                 out.writeObject("Không tìm thấy user");

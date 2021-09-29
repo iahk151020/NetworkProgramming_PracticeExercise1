@@ -6,10 +6,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import Controllers.ClientController;
@@ -32,6 +35,8 @@ public class ClientView extends JFrame implements ActionListener {
     private JPanel content;
     private ClientController controller;
     private JTextArea userList;
+    private JTable table;
+    private DefaultTableModel dm;
   
     
     public ClientView(){
@@ -43,11 +48,16 @@ public class ClientView extends JFrame implements ActionListener {
         userList.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         JLabel filterName = new JLabel("Nhập tên người dùng: ");
         submitBtn = new JButton("Tìm");
-        content.setPreferredSize(new Dimension(400,300));
+        String[] cols = new String[]{"STT", "ID", "USERNAME", "BIRTHDAY", "ADDRESS", "SEX", "DESCRIPTION"};
+        dm = new DefaultTableModel(new Object[][]{}, cols);
+        table = new JTable();
+        table.setModel(dm);
+        JScrollPane scrollPane = new JScrollPane(table);
+        content.setPreferredSize(new Dimension(600,500));
         content.add(filterName);
         content.add(filterField);
         content.add(submitBtn);
-        content.add(userList);
+        content.add(scrollPane);
         submitBtn.addActionListener(this);
 
         this.setSize(new Dimension(1200, 1000));
@@ -59,6 +69,7 @@ public class ClientView extends JFrame implements ActionListener {
                 System.exit(0);
                 }
             });
+    
     }
 
     
@@ -66,23 +77,23 @@ public class ClientView extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(submitBtn)){
-            //createNewTable();
+
             String filter = filterField.getText();
             System.out.println("Clicked btn");
             try {
+                dm.setRowCount(0);
                 userList.setText("ID | USERNAME | DOB | ADDRESS | SEX | DESCRIPTION\n");
                 controller.openConnection();
                 controller.sendData(filter);
                 Object reply = controller.getData();
-                System.out.println("reply:" + reply);
                 if (reply instanceof String){
                     JOptionPane.showMessageDialog(this,(String)reply);
                 } else if (reply instanceof ArrayList){
+                    int index = 0;
                     ArrayList<User> dataSet = (ArrayList<User>)reply;
                     for (User user : dataSet) {
-                        System.out.println(user);
-                         userList.append(String.valueOf(user.getUserId()) + " | " + user.getUserName() + " | " + user.getBirthday()
-                        + " | " + user.getAddress() + " | " + user.getSex() + " | " + user.getDes() + "\n" );
+                        index++;
+                        dm.addRow(new Object[]{index,user.getUserId(), user.getUserName(), user.getBirthday(), user.getAddress(), user.getSex(), user.getDes()});
                     }
                 }
                 
